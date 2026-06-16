@@ -30,6 +30,12 @@ uri = "file://artifacts/course-promo/public/images/data-shapes.png"
 type = "image"
 title = "Fun geometric data shapes"
 
+[[generated]]
+id = "3dDytthrIXmWDESuS-sBC"
+uri = "file://artifacts/course-promo/public/images/wug.png"
+type = "image"
+title = "Wug creature line art"
+
 [[outputs]]
 id = "k9ub7M-_NtEMTP4gQFmL8"
 uri = "file://artifacts/qr-course-demo/public/audio/bg_music.mp3"

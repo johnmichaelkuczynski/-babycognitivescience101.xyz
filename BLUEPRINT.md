@@ -14,7 +14,7 @@ The product surface is three deployable artifacts in one pnpm monorepo:
 | --- | --- | --- |
 | `@workspace/api-server` | `api-server` | Express 5 API mounted at `/api`. Owns the DB, OpenAI calls, AI detection, grading, diagnostics. |
 | `@workspace/qr-course` | `qr-course` | Student-facing React + Vite app. The actual course. |
-| `@workspace/qr-course-demo` | `qr-course-demo` | A screencast-style product demo video, exported as MP4 from the preview pane. |
+| `@workspace/course-promo` | `course-promo` | Promo video that *demonstrates* the course's ideas (Müller-Lyer illusion, the Wug test, the bat-and-ball problem, false memory), exported as MP4 from the preview pane. |
 
 Shared contracts live in `lib/`:
 
@@ -252,39 +252,32 @@ The trace is included in the answer `PUT` body and on `POST submit`, then stored
 
 ---
 
-## 8. Demo video — `@workspace/qr-course-demo`
+## 8. Promo video — `@workspace/course-promo`
 
-A **screencast-style** product walkthrough, **not** a marketing reel. Built per the `video-js` skill: React + framer-motion, exported to MP4 from the preview pane via the browser recorder.
+A **show-don't-tell promo**: rather than describing the course, it *animates the actual "aha" demonstrations* the course teaches, so a viewer experiences a few mind-bending moments before the course name even lands. Built per the `video-js` skill: React + framer-motion, exported to MP4 from the preview pane via the browser recorder.
 
 ### 8.1 Structure
 
 ```
-artifacts/qr-course-demo/src/components/video/
-├── VideoTemplate.tsx        scene router + persistent sidebar + persistent cursor + background audio
-├── VideoWithControls.tsx    iframe-only wrapper: scene jump, scene-lock, mute toggle
-├── useSceneControls.ts      hook hiding jump/lock workarounds for the read-only useVideoPlayer
-├── CursorPointer.tsx        animated SVG arrow that drives the "user is clicking" feel
-├── TypewriterText.tsx       char-by-char typing into inputs
-├── StreamingText.tsx        word-by-word AI-response streaming
-├── TypingIndicator.tsx      three pulsing dots
+artifacts/course-promo/src/components/video/
+├── VideoTemplate.tsx        scene router + persistent background layer + audio sync
 └── video_scenes/
-    ├── Scene1.tsx           Dashboard → Week 1 (8s)
-    ├── Scene2.tsx           Lecture: Short/Long toggle + Practice/Tutor tabs (8s)
-    ├── Scene3.tsx           Tutor Q&A with streaming response (12s)
-    ├── Scene4.tsx           Analytics with counting KPIs + topic mastery click (10s)
-    ├── Scene5.tsx           Topic Practice: wrong → adjust ↓ → right → adjust ↑ (14s)
-    └── Scene6.tsx           Assignments review with AI grade + AI-detection chip (10s)
+    ├── Scene1.tsx           Intro hook — "A baby course on HOW THE MIND WORKS"
+    ├── Scene2.tsx           Perception: Müller-Lyer illusion — a ruler reveals the lines are identical
+    ├── Scene3.tsx           Language: the Wug test — one wug → two "wugs"
+    ├── Scene4.tsx           Reasoning: the bat-and-ball problem — gut answer 10¢ crossed out, correct 5¢
+    ├── Scene5.tsx           Memory: false-memory word list — you "remember" SLEEP, never shown
+    └── Scene6.tsx           Outro lockup — "Cognitive Science 101" (1 unit, 8 sections, AI-taught & graded)
 ```
 
-`SCENE_DURATIONS` sums to **62 seconds**, looped.
+Each demo beat animates the demonstration itself, not a description of it — that is the whole point of the rebuild.
 
 ### 8.2 Key architectural rules
 
-- **Sidebar persistence.** The Dashboard / Assignments / Analytics sidebar lives in `VideoTemplate.tsx` outside `<AnimatePresence>`. Only the right-pane scene swaps. Active highlight is derived from `sceneIndex`.
-- **Cursor persistence.** `CursorPointer` lives outside `<AnimatePresence>` and is driven by `setCursorPos / setIsClicking` passed into every scene.
-- **The UI is rebuilt, not screenshotted.** Scenes use the real fonts and colors but every pixel is JSX. `attached_assets/qr-screens/*.jpg` were reference-only.
+- **Persistent background layer.** The animated background lives in `VideoTemplate.tsx` outside `<AnimatePresence>` so it drifts continuously across scene cuts instead of resetting per scene.
+- **Demonstrations are animated, not described.** Each demo scene animates the actual phenomenon (a ruler proving the Müller-Lyer lines are equal, the gut answer being crossed out, the never-shown word being "remembered") — the payoff is the viewer experiencing the effect, not reading about it.
 - **`AnimatePresence` key = `currentSceneKey`** (NOT `baseSceneKey`). When scene-lock toggles `_r1` / `_r2` on the durations object, both iterations must remount and re-animate.
-- **Audio.** One bg music file at `public/audio/bg_music.mp3` (62s, instrumental piano + strings, generated). Scene-synced via `SCENE_START_SEC` — on every scene change the audio seeks to that scene's canonical start offset (epsilon 0.18s).
+- **Audio.** One bg music file at `public/audio/bg_music.mp3`, scene-synced via `SCENE_START_SEC` — on every scene change the audio seeks to that scene's canonical start offset (epsilon 0.18s).
 - **Mute wiring.** Iframe preview defaults to muted; control bar exposes `Volume2` / `VolumeX`. Export path renders `<VideoTemplate />` with no props → unmuted, no controls. The mute toggle is **declarative JSX (`<audio muted={muted}>`) only** — it must not also re-seek `audio.currentTime`, or unmute restarts the scene's audio.
 
 ### 8.3 Scene controls

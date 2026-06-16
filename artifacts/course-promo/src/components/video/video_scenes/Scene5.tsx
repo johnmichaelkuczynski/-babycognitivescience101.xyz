@@ -4,59 +4,85 @@ import { useEffect, useState } from 'react';
 export function Scene5() {
   const [phase, setPhase] = useState(0);
 
+  const words = ["bed", "rest", "awake", "tired", "dream", "night", "snooze"];
+
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),
-      setTimeout(() => setPhase(2), 2000),
+      setTimeout(() => setPhase(1), 500),  // Start flashing words
+      setTimeout(() => setPhase(2), 2500), // Stop flashing, ask question
+      setTimeout(() => setPhase(3), 4500), // Reveal "SLEEP"
+      setTimeout(() => setPhase(4), 5500), // "Never shown"
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
 
   return (
     <motion.div 
-      className="absolute inset-0 flex flex-col items-center justify-center bg-bg-dark text-white"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, filter: 'blur(20px)' }}
-      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+      className="absolute inset-0 flex flex-col items-center justify-center bg-[#1e293b]"
+      initial={{ opacity: 0, x: '20%' }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-primary)_0%,_transparent_50%)] opacity-[0.05]" />
-
       <motion.div 
-        className="relative z-10 flex flex-col items-center"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={phase >= 1 ? { scale: 1, opacity: 1 } : { scale: 0.9, opacity: 0 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute top-16 left-16 text-[2vw] font-bold text-accent tracking-widest uppercase"
+        initial={{ opacity: 0, x: -20 }}
+        animate={phase >= 1 ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
       >
-        <div className="text-[6vw] font-display font-black tracking-tight leading-none text-center mb-6">
-          COGNITIVE<br/>SCIENCE 101
-        </div>
-
-        <motion.div 
-          className="text-[2vw] text-white/80 font-bold max-w-[70vw] text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.8 }}
-        >
-          A baby course on how the mind works — taught, tutored, drilled, and graded by AI.
-        </motion.div>
+        Unit 1.4: Memory
       </motion.div>
 
-      {/* Decorative stars */}
-      <motion.div 
-        className="absolute top-[20%] left-[20%] text-accent text-[3vw]"
-        animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-      >
-        ✦
-      </motion.div>
-      <motion.div 
-        className="absolute bottom-[20%] right-[20%] text-secondary text-[2vw]"
-        animate={{ scale: [1, 1.5, 1], rotate: [0, -180, -360] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-      >
-        ✦
-      </motion.div>
+      <div className="relative w-full h-full flex flex-col items-center justify-center">
+        
+        {/* Flashing Words */}
+        {phase === 1 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            {words.map((word, i) => (
+              <motion.div
+                key={i}
+                className="absolute text-[8vw] font-black uppercase tracking-widest text-white/80"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: [0, 1, 0], scale: [0.8, 1, 1.2] }}
+                transition={{ duration: 0.3, delay: i * 0.25, times: [0, 0.5, 1] }}
+              >
+                {word}
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {/* Question & Reveal */}
+        {phase >= 2 && (
+          <motion.div 
+            className="flex flex-col items-center z-10"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="text-[4vw] font-display font-bold text-white mb-8">
+              Did you see the word
+            </div>
+            <motion.div 
+              className="text-[10vw] font-black uppercase tracking-tighter leading-none"
+              initial={{ scale: 0.8, color: '#fdfbf7' }}
+              animate={phase >= 3 ? { scale: 1.1, color: '#f43f5e' } : { scale: 1, color: '#fdfbf7' }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            >
+              SLEEP?
+            </motion.div>
+
+            {phase >= 4 && (
+              <motion.div
+                className="mt-8 text-[3vw] font-bold text-white/60 bg-black/40 px-8 py-4 rounded-xl backdrop-blur-sm"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                It was <span className="text-white">never</span> shown.
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </div>
     </motion.div>
   );
 }

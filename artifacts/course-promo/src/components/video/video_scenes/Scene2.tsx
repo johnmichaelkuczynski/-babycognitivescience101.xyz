@@ -4,21 +4,12 @@ import { useEffect, useState } from 'react';
 export function Scene2() {
   const [phase, setPhase] = useState(0);
 
-  const topics = [
-    "Information Processing",
-    "Perception",
-    "Memory",
-    "Language & Thought",
-    "Reasoning & Bias",
-    "Brains & Machines",
-    "Consciousness"
-  ];
-
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 300),
-      setTimeout(() => setPhase(2), 2000),
-      setTimeout(() => setPhase(3), 5000),
+      setTimeout(() => setPhase(1), 500),
+      setTimeout(() => setPhase(2), 2000), // Slide ruler in
+      setTimeout(() => setPhase(3), 3500), // Reveal equal lines
+      setTimeout(() => setPhase(4), 5000), // "Perception"
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
@@ -26,44 +17,67 @@ export function Scene2() {
   return (
     <motion.div 
       className="absolute inset-0 flex flex-col items-center justify-center bg-bg-light"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, x: '-20%', filter: 'blur(10px)' }}
+      initial={{ opacity: 0, x: '20%' }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="absolute inset-0 opacity-20" style={{ 
-        backgroundImage: 'radial-gradient(circle at center, var(--color-secondary) 0%, transparent 60%)' 
-      }} />
+      <motion.div 
+        className="absolute top-16 left-16 text-[2vw] font-bold text-accent tracking-widest uppercase"
+        initial={{ opacity: 0, x: -20 }}
+        animate={phase >= 4 ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+      >
+        Unit 1.3: Perception
+      </motion.div>
 
-      <div className="relative z-10 w-full flex flex-col items-center">
-        <motion.div 
-          className="text-[4vw] font-display font-bold italic text-secondary mb-12"
-          initial={{ y: -50, opacity: 0 }}
-          animate={phase >= 1 ? { y: 0, opacity: 1 } : { y: -50, opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          No Math. No Coding. Just the Mind.
+      <div className="relative w-[60vw] h-[40vh] flex flex-col justify-center items-center gap-16">
+        {/* Top Line */}
+        <motion.div className="relative w-[30vw] h-[4px] bg-white flex items-center justify-center">
+          {/* Arrows pointing in */}
+          <motion.div className="absolute left-0 w-8 h-8 border-t-4 border-l-4 border-white rotate-[-45deg] origin-left translate-x-[-2px]" />
+          <motion.div className="absolute left-0 w-8 h-8 border-b-4 border-l-4 border-white rotate-[45deg] origin-left translate-x-[-2px]" />
+          
+          <motion.div className="absolute right-0 w-8 h-8 border-t-4 border-r-4 border-white rotate-[45deg] origin-right translate-x-[2px]" />
+          <motion.div className="absolute right-0 w-8 h-8 border-b-4 border-r-4 border-white rotate-[-45deg] origin-right translate-x-[2px]" />
         </motion.div>
 
-        <div className="flex flex-wrap justify-center gap-6 max-w-[80vw]">
-          {topics.map((topic, i) => (
-            <motion.div
-              key={i}
-              className="bg-bg-muted border border-white/10 px-6 py-3 rounded-full text-[2vw] font-bold text-white shadow-xl"
-              initial={{ scale: 0, opacity: 0, y: 20 }}
-              animate={phase >= 2 ? { scale: 1, opacity: 1, y: 0 } : { scale: 0, opacity: 0, y: 20 }}
-              transition={{ 
-                type: 'spring', 
-                stiffness: 300, 
-                damping: 20, 
-                delay: i * 0.15 
-              }}
-            >
-              {topic}
-            </motion.div>
-          ))}
-        </div>
+        {/* Bottom Line */}
+        <motion.div className="relative w-[30vw] h-[4px] bg-white flex items-center justify-center">
+          {/* Arrows pointing out */}
+          <motion.div className="absolute left-0 w-8 h-8 border-t-4 border-r-4 border-white rotate-[45deg] origin-left translate-x-[-12px]" />
+          <motion.div className="absolute left-0 w-8 h-8 border-b-4 border-r-4 border-white rotate-[-45deg] origin-left translate-x-[-12px]" />
+          
+          <motion.div className="absolute right-0 w-8 h-8 border-t-4 border-l-4 border-white rotate-[-45deg] origin-right translate-x-[12px]" />
+          <motion.div className="absolute right-0 w-8 h-8 border-b-4 border-l-4 border-white rotate-[45deg] origin-right translate-x-[12px]" />
+        </motion.div>
+
+        {/* Ruler Overlay */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+        >
+          <motion.div 
+            className="absolute top-[-5vh] bottom-[-5vh] left-[15vw] border-l-2 border-dashed border-secondary"
+            initial={{ opacity: 0, y: '-100%' }}
+            animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: '-100%' }}
+            transition={{ duration: 1, type: "spring", stiffness: 100 }}
+          />
+          <motion.div 
+            className="absolute top-[-5vh] bottom-[-5vh] right-[15vw] border-r-2 border-dashed border-secondary"
+            initial={{ opacity: 0, y: '100%' }}
+            animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: '100%' }}
+            transition={{ duration: 1, type: "spring", stiffness: 100 }}
+          />
+        </motion.div>
       </div>
+
+      <motion.div 
+        className="mt-16 text-[4vw] font-display font-bold text-center leading-tight"
+        initial={{ opacity: 0, y: 20 }}
+        animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      >
+        Your brain builds the world.<br/>
+        <span className="text-secondary italic">They are identical.</span>
+      </motion.div>
     </motion.div>
   );
 }

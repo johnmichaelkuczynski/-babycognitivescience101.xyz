@@ -6,21 +6,24 @@ import { Scene2 } from './video_scenes/Scene2';
 import { Scene3 } from './video_scenes/Scene3';
 import { Scene4 } from './video_scenes/Scene4';
 import { Scene5 } from './video_scenes/Scene5';
+import { Scene6 } from './video_scenes/Scene6';
 
 export const SCENE_DURATIONS = {
-  s1_intro: 6000,
-  s2_topics: 6000,
-  s3_features: 8000,
-  s4_grading: 10000,
-  s5_outro: 6000
+  s1_intro: 4000,
+  s2_perception: 7000,
+  s3_language: 7000,
+  s4_reasoning: 7000,
+  s5_memory: 7000,
+  s6_outro: 6000
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
   s1_intro: Scene1,
-  s2_topics: Scene2,
-  s3_features: Scene3,
-  s4_grading: Scene4,
-  s5_outro: Scene5
+  s2_perception: Scene2,
+  s3_language: Scene3,
+  s4_reasoning: Scene4,
+  s5_memory: Scene5,
+  s6_outro: Scene6
 };
 
 const SCENE_START_SEC: Record<string, number> = (() => {
@@ -46,7 +49,7 @@ export default function VideoTemplate({
   muted?: boolean;
   onSceneChange?: (sceneKey: string) => void;
 } = {}) {
-  const { currentSceneKey } = useVideoPlayer({ durations, loop });
+  const { currentSceneKey, currentScene } = useVideoPlayer({ durations, loop });
 
   useEffect(() => {
     onSceneChange?.(currentSceneKey);
@@ -73,25 +76,21 @@ export default function VideoTemplate({
       {/* Persistent Background Layer */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
-          className="absolute w-[100vw] h-[100vw] rounded-full opacity-[0.03] blur-3xl mix-blend-screen"
+          className="absolute w-[120vw] h-[120vw] rounded-full opacity-[0.04] blur-3xl mix-blend-screen"
           style={{ background: 'radial-gradient(circle, var(--color-accent), transparent)' }}
           animate={{ x: ['-20%', '30%', '-10%'], y: ['-10%', '40%', '-20%'], scale: [1, 1.2, 0.9] }}
           transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute w-[80vw] h-[80vw] rounded-full opacity-[0.03] blur-3xl right-0 bottom-0 mix-blend-screen"
+          className="absolute w-[100vw] h-[100vw] rounded-full opacity-[0.04] blur-3xl right-0 bottom-0 mix-blend-screen"
           style={{ background: 'radial-gradient(circle, var(--color-secondary), transparent)' }}
           animate={{ x: ['20%', '-20%', '10%'], y: ['10%', '-30%', '20%'] }}
           transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
         />
         
-        {/* Subtle grid texture */}
-        <div className="absolute inset-0" 
-             style={{ 
-               backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
-               backgroundSize: '40px 40px',
-               opacity: 0.5
-             }} 
+        {/* Subtle noise texture */}
+        <div className="absolute inset-0 opacity-[0.02]" 
+             style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")' }} 
         />
       </div>
 

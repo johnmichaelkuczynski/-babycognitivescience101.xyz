@@ -6,29 +6,22 @@ export function Scene1() {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),
-      setTimeout(() => setPhase(2), 2000),
-      setTimeout(() => setPhase(3), 4500),
+      setTimeout(() => setPhase(1), 300),
+      setTimeout(() => setPhase(2), 1500),
+      setTimeout(() => setPhase(3), 3000),
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
 
   return (
     <motion.div 
-      className="absolute inset-0 flex flex-col items-center justify-center"
+      className="absolute inset-0 flex flex-col items-center justify-center bg-bg-dark"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
       transition={{ duration: 1 }}
     >
       <div className="relative z-10 text-center flex flex-col items-center justify-center h-full w-full">
-        <motion.div 
-          className="absolute inset-0 border-[1px] border-white/10 m-12"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.5, ease: 'easeOut' }}
-        />
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -39,7 +32,7 @@ export function Scene1() {
         </motion.div>
 
         <motion.h1 
-          className="text-[8vw] leading-none font-display text-white text-center tracking-tight"
+          className="text-[8vw] leading-none font-display text-white text-center tracking-tight font-black"
         >
           {'HOW THE'.split(' ').map((word, i) => (
             <motion.span 
