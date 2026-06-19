@@ -6,82 +6,98 @@ export function Scene3() {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),  // Reveal first Wug
-      setTimeout(() => setPhase(2), 2000), // "Now there are two..."
-      setTimeout(() => setPhase(3), 3500), // Reveal second Wug
-      setTimeout(() => setPhase(4), 5000), // Reveal answer WUGS
+      setTimeout(() => setPhase(1), 500),
+      setTimeout(() => setPhase(2), 2000), // Select answer
+      setTimeout(() => setPhase(3), 3500), // Lock & Submit
+      setTimeout(() => setPhase(4), 4500), // Reveal grading
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
 
   return (
     <motion.div 
-      className="absolute inset-0 flex flex-col items-center justify-center bg-[#1e293b]"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, x: '-20%', filter: 'blur(10px)' }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="absolute inset-0 flex items-center justify-center p-20 bg-slate-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, y: '-10%', filter: 'blur(10px)' }}
+      transition={{ duration: 0.8 }}
     >
-      <motion.div 
-        className="absolute top-16 left-16 text-[2vw] font-bold text-accent tracking-widest uppercase"
-        initial={{ opacity: 0, x: -20 }}
-        animate={phase >= 1 ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-      >
-        Unit 1.5: Language
-      </motion.div>
-
-      <div className="flex flex-col items-center w-full px-20">
-        <div className="flex gap-16 justify-center items-end h-[30vh] mb-12">
-          {/* First Wug */}
-          <motion.div
-            className="flex flex-col items-center"
-            initial={{ opacity: 0, y: 50 }}
-            animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <img 
-              src={`${import.meta.env.BASE_URL}images/wug.png`} 
-              alt="Wug" 
-              className="w-[20vw] h-[20vw] object-contain drop-shadow-2xl brightness-0 invert" 
-            />
-            <div className="text-[3vw] font-display font-bold mt-4">This is a WUG.</div>
-          </motion.div>
-
-          {/* Second Wug */}
-          <motion.div
-            className="flex flex-col items-center"
-            initial={{ opacity: 0, scale: 0, y: 50 }}
-            animate={phase >= 3 ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0, y: 50 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <img 
-              src={`${import.meta.env.BASE_URL}images/wug.png`} 
-              alt="Wug" 
-              className="w-[20vw] h-[20vw] object-contain drop-shadow-2xl brightness-0 invert" 
-            />
-          </motion.div>
-        </div>
-
-        <motion.div 
-          className="text-[5vw] font-display font-bold text-center leading-tight flex items-baseline gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      <div className="w-1/2 pr-20 relative z-10 flex flex-col justify-center">
+        <motion.h2 
+          className="text-slate-500 font-bold tracking-widest uppercase text-sm mb-4"
         >
-          Now there are two
-          <motion.div className="relative inline-block border-b-4 border-white pb-2 min-w-[20vw] text-center">
-            {phase >= 4 && (
-              <motion.span 
-                className="text-secondary absolute bottom-2 left-0 right-0"
-                initial={{ opacity: 0, scale: 0, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+          Rigorous Assessment
+        </motion.h2>
+        <motion.h1 
+          className="text-5xl font-display font-bold text-slate-900 leading-tight mb-6"
+        >
+          One attempt. Fully locked. Inverted partial credit.
+        </motion.h1>
+        <motion.p className="text-xl text-slate-600 leading-relaxed mb-6">
+          Submit once. Hedging earns nothing. The strongest, most falsifiable conclusion earns top marks, supported by instant AI rationales.
+        </motion.p>
+      </div>
+
+      <div className="w-1/2 relative z-10">
+        <motion.div 
+          className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center">
+            <span className="font-bold text-slate-700">Homework 1.6</span>
+            <span className="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
+              {phase >= 3 ? 'Locked' : 'Draft'}
+            </span>
+          </div>
+          <div className="p-8">
+            <div className="text-lg font-medium text-slate-800 mb-6">
+              Which statement represents the strongest falsifiable hypothesis regarding confirmation bias in this scenario?
+            </div>
+
+            <div className="space-y-3 mb-8">
+              {[
+                "People might sometimes ignore contrary evidence.",
+                "Individuals presented with counter-evidence will double-down on their prior belief.",
+                "It depends on the individual's prior exposure to the topic."
+              ].map((opt, i) => (
+                <motion.div 
+                  key={i}
+                  className={`p-4 rounded-lg border ${phase >= 2 && i === 1 ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-600'}`}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  {opt}
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="flex justify-between items-end">
+              <motion.button 
+                className={`px-6 py-3 rounded-lg font-bold transition-all ${phase >= 3 ? 'bg-slate-200 text-slate-400' : 'bg-blue-600 text-white shadow-lg'}`}
               >
-                WUGS
-              </motion.span>
-            )}
-            <span className="opacity-0">WUGS</span>
-          </motion.div>
-          ?
+                {phase >= 3 ? 'Submitted' : 'Submit Final Answer'}
+              </motion.button>
+              
+              {phase >= 4 && (
+                <motion.div 
+                  className="bg-green-50 text-green-800 p-4 rounded-lg border border-green-200 max-w-sm"
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ type: "spring", damping: 20 }}
+                >
+                  <div className="font-bold flex items-center gap-2 mb-1">
+                    <span className="text-xl">100%</span> 
+                    <span className="text-xs uppercase tracking-wider bg-green-200 px-2 py-0.5 rounded-sm">Full Credit</span>
+                  </div>
+                  <div className="text-sm leading-snug">
+                    Rationale: Strongest falsifiable claim. The other options hedge ("might sometimes", "depends") which cannot be rigorously tested.
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </div>
         </motion.div>
       </div>
     </motion.div>

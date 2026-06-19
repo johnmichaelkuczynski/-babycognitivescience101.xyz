@@ -4,65 +4,61 @@ Copy-paste ready metadata for the promo video (exported from the `course-promo` 
 
 ---
 
-## Title options (pick one)
+## Title
 
-1. **Cognitive Science 101 — A Baby Course on How the Mind Works (Taught & Graded by AI)**
-2. **How the Mind Works in 8 Short Lessons — Cognitive Science 101**
-3. **The AI Course That Punishes Hedging — Cognitive Science 101**
-4. **Cognitive Science 101: Perception, Memory, Reasoning & Consciousness, Explained Simply**
+Cognitive Science 101 — AI-Powered Course
 
 ---
 
 ## Description
 
-What if a course rewarded you for *committing* to an answer instead of hiding behind "it's complicated"?
+Cognitive Science 101 is a self-paced course on how the mind works, taught, tutored, drilled, and graded entirely by AI. It is a basic but substantial introduction built for adults stepping into a new discipline — graduate students, faculty, and anyone who needs a fast, rigorous on-ramp to the field.
 
-Cognitive Science 101 is a self-paced, plain-language "baby course" on how the mind works — no math, no coding, no background required. In one unit and eight short sections you'll explore perception, memory, language and thought, reasoning and bias, whether machines can think, and the hard problem of consciousness. Every lesson is taught, tutored, drilled, and graded by AI.
+One unit, eight sections, each with a full lesson and a graded homework:
 
-The twist is the grading. Most "critical thinking" rewards caution — the more hedged the answer, the safer it feels. Here, hedging is the failure mode. You earn top marks for committing to the strongest, most-falsifiable conclusion the evidence supports about the mind, and naming the cleanest test that could prove you wrong. "The brain is too complex to say" scores near zero.
+• 1.1 What Cognitive Science Is
+• 1.2 The Big Idea: Mind as Information Processing
+• 1.3 Perception
+• 1.4 Memory
+• 1.5 Language and Thought
+• 1.6 Reasoning and Bias
+• 1.7 Brains and Machines
+• 1.8 Consciousness
 
 What's inside:
-• An AI tutor that answers questions about the exact paragraph you're reading
-• Every lesson at three depths — short, medium, or long
-• AI-graded homework in your choice of format: multiple-choice, hybrid, or written
-• Adaptive practice that ramps difficulty up after a streak and down after a miss
-• Two-layer AI-authorship detection on every submission
-• A four-phase reasoning diagnostic that tracks how your thinking grows across the course
+• Every lesson at three depths — short, medium, or long — rewritten on demand while preserving the same examples and objectives
+• A section-scoped AI tutor that answers questions about the exact passage you're reading, streamed token by token
+• One graded homework per section in your choice of format — multiple-choice, hybrid, or written — with a single, locking attempt
+• Inverted partial-credit grading: top marks go to the strongest, most-falsifiable conclusion the evidence supports, and to naming the test that could prove it wrong; hedging scores near zero
+• Adaptive practice that raises difficulty after a streak and lowers it after a miss, with an explanation on every problem
+• Two-layer AI-authorship detection on every submission — a static text classifier plus a behavioral keystroke analysis, each with a written rationale
+• A four-phase reasoning diagnostic that tracks how your thinking develops across the course
+• Live analytics: per-section mastery, accuracy, streaks, and a narrative performance report
 
-Built for middle schoolers, curious adults wanting a quick but real introduction, instructors evaluating AI-taught coursework, and researchers studying AI academic integrity.
+The grading is the point. Most coursework rewards caution — the more hedged the answer, the safer it feels. Here, hedging is the failure mode. You earn the grade by committing to the strongest conclusion the evidence supports and naming the cleanest test that could falsify it.
 
 ▶ Start the course / learn more: [add your link]
 
-Cognitive Science 101 — where the strongest honest conclusion, not the safest hedge, earns the grade.
-
-#cognitivescience #AIeducation #howthemindworks #edtech #criticalthinking
-
 ---
 
-## Short description (for Shorts / social cross-post)
+## Short description (for social cross-post)
 
-A baby course on how the mind works — perception, memory, reasoning, machines, and consciousness — taught and graded by AI. The catch: hedging fails. You score by committing to the strongest conclusion the evidence supports. #cognitivescience #AIeducation
+Cognitive Science 101 — AI-Powered Course. A self-paced, eight-section course on how the mind works: three-depth lessons, a section-scoped AI tutor, single-attempt graded homework, adaptive practice, and AI-authorship detection on every submission.
 
 ---
 
 ## Tags
 
-cognitive science, cognitive science 101, how the mind works, psychology course, AI tutor, AI education, edtech, online course, perception, memory, language and thought, reasoning and bias, cognitive bias, artificial intelligence, machine learning, consciousness, hard problem of consciousness, critical thinking, AI grading, adaptive learning, self-paced course, learn psychology, brain science, philosophy of mind, AI detection
+cognitive science, cognitive science 101, how the mind works, AI tutor, AI grading, AI education, edtech, online course, self-paced course, perception, memory, language and thought, reasoning and bias, cognitive bias, brains and machines, consciousness, philosophy of mind, adaptive learning, AI detection, academic integrity
 
 ---
 
 ## Suggested chapters
 
-> Adjust timestamps to the final exported runtime.
-
-- 0:00 — A baby course on how the mind works
-- 0:08 — One unit, eight ideas
-- 0:18 — Taught, tutored, drilled & graded by AI
-- 0:26 — The inverted grade: commit, don't hedge
-- 0:34 — Cognitive Science 101
+> Fill in after export — match timestamps to the scenes in the final video.
 
 ---
 
 ## Pinned comment (optional)
 
-The twist: this course rewards you for committing to the strongest conclusion the evidence supports — and naming the test that could prove you wrong. Hedging scores near zero. What would *you* commit to about how the mind works?
+The grading is inverted: you score by committing to the strongest conclusion the evidence supports — and naming the test that could prove you wrong. Hedging scores near zero.

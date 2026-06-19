@@ -89,16 +89,16 @@ export default function Landing() {
         <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-medium mb-6">
             <BarChart3 className="w-3.5 h-3.5" />
-            A one-unit baby course on how the mind works
+            A one-unit introduction to how the mind works
           </div>
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-primary leading-tight mb-5">
             How the mind works — taught, tutored, drilled, and graded by AI.
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            A self-paced baby course on cognitive science — perception, memory,
-            language, reasoning, machine minds, and consciousness. Plain lessons,
-            an AI tutor, adaptive practice, and AI-graded homework. No math or
-            coding required.
+            A self-paced introduction to cognitive science — perception, memory,
+            language, reasoning, machine minds, and consciousness. Plain-language
+            lessons, an AI tutor, adaptive practice, and AI-graded homework — a
+            fast, rigorous on-ramp for adults new to the field.
           </p>
           <div className="flex items-center justify-center gap-3">
             <Link href="/sign-up">
@@ -163,7 +163,7 @@ export default function Landing() {
       </main>
 
       <footer className="border-t border-border px-6 py-6 text-center text-sm text-muted-foreground">
-        Cognitive Science 101 — a baby course on how the mind works, taught,
+        Cognitive Science 101 — an introduction to how the mind works, taught,
         tutored, drilled, and graded by AI.
       </footer>
     </div>

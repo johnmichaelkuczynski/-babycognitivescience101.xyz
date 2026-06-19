@@ -6,7 +6,7 @@ A complete architectural blueprint for the Cognitive Science 101 one-unit course
 
 ## 1. Product summary
 
-Cognitive Science 101 is a self-paced, single-user web course — a plain-language "baby course" on how the mind works (one unit, 8 sections — from What Cognitive Science Is through Consciousness, covering perception, memory, language, reasoning & bias, and machine minds). Students read AI-rewritten lecture notes at three lengths, ask an AI tutor scoped to the section they're reading, drill on adaptive scenario practice, and submit **one homework per section** that is AI-graded on an **inverted partial-credit scale** and AI-detection-screened. Grading is the inverted core: the strongest, most-testable conclusion the evidence supports about the mind earns top credit; the cautious "we can't conclude anything / the brain is too complex" dodge earns near-zero. There is **no separate test, midterm, or final** — homework is the graded model.
+Cognitive Science 101 is a self-paced, single-user web course — a plain-language introduction to how the mind works (one unit, 8 sections — from What Cognitive Science Is through Consciousness, covering perception, memory, language, reasoning & bias, and machine minds). Students read AI-rewritten lecture notes at three lengths, ask an AI tutor scoped to the section they're reading, drill on adaptive scenario practice, and submit **one homework per section** that is AI-graded on an **inverted partial-credit scale** and AI-detection-screened. Grading is the inverted core: the strongest, most-testable conclusion the evidence supports about the mind earns top credit; the cautious "we can't conclude anything / the brain is too complex" dodge earns near-zero. There is **no separate test, midterm, or final** — homework is the graded model.
 
 The product surface is three deployable artifacts in one pnpm monorepo:
 
@@ -14,7 +14,7 @@ The product surface is three deployable artifacts in one pnpm monorepo:
 | --- | --- | --- |
 | `@workspace/api-server` | `api-server` | Express 5 API mounted at `/api`. Owns the DB, OpenAI calls, AI detection, grading, diagnostics. |
 | `@workspace/qr-course` | `qr-course` | Student-facing React + Vite app. The actual course. |
-| `@workspace/course-promo` | `course-promo` | Promo video that *demonstrates* the course's ideas (Müller-Lyer illusion, the Wug test, the bat-and-ball problem, false memory), exported as MP4 from the preview pane. |
+| `@workspace/course-promo` | `course-promo` | Promo video that *walks through the actual product* (curriculum, lecture reader + depth toggle, AI tutor, graded homework, AI-authorship detection, analytics), exported as MP4 from the preview pane. |
 
 Shared contracts live in `lib/`:
 
@@ -254,7 +254,7 @@ The trace is included in the answer `PUT` body and on `POST submit`, then stored
 
 ## 8. Promo video — `@workspace/course-promo`
 
-A **show-don't-tell promo**: rather than describing the course, it *animates the actual "aha" demonstrations* the course teaches, so a viewer experiences a few mind-bending moments before the course name even lands. Built per the `video-js` skill: React + framer-motion, exported to MP4 from the preview pane via the browser recorder.
+A **show-the-product promo**: rather than describing the course in the abstract or animating generic pop-science demos, it *walks through the actual app surface* — the real curriculum, the lecture reader, the AI tutor, the graded homework, the detection results, and the analytics — so a viewer sees the genuine, substantial product before the course name lands. Built per the `video-js` skill: React + framer-motion, exported to MP4 from the preview pane via the browser recorder. The tone is rigorous and academic (Cormorant Garamond + Inter, slate/white/blue), aimed at adults entering the discipline.
 
 ### 8.1 Structure
 
@@ -262,20 +262,21 @@ A **show-don't-tell promo**: rather than describing the course, it *animates the
 artifacts/course-promo/src/components/video/
 ├── VideoTemplate.tsx        scene router + persistent background layer + audio sync
 └── video_scenes/
-    ├── Scene1.tsx           Intro hook — "A baby course on HOW THE MIND WORKS"
-    ├── Scene2.tsx           Perception: Müller-Lyer illusion — a ruler reveals the lines are identical
-    ├── Scene3.tsx           Language: the Wug test — one wug → two "wugs"
-    ├── Scene4.tsx           Reasoning: the bat-and-ball problem — gut answer 10¢ crossed out, correct 5¢
-    ├── Scene5.tsx           Memory: false-memory word list — you "remember" SLEEP, never shown
-    └── Scene6.tsx           Outro lockup — "Cognitive Science 101" (1 unit, 8 sections, AI-taught & graded)
+    ├── Scene1.tsx (curriculum)     The curriculum — one unit, all 8 real sections (1.1–1.8)
+    ├── Scene2.tsx (lecture_tutor)  Lecture reader Short/Medium/Long depth toggle + section-scoped AI tutor answering
+    ├── Scene3.tsx (homework)       Single-attempt homework, locks on submit, inverted partial credit + written rationale
+    ├── Scene4.tsx (detection)      Two-layer AI-authorship detection — static text classifier + behavioral keystroke analysis
+    ├── Scene5.tsx (analytics)      Live analytics + adaptive practice difficulty ramping
+    └── Scene6.tsx (outro)          Outro lockup — "Cognitive Science 101 — AI-Powered Course"
 ```
 
-Each demo beat animates the demonstration itself, not a description of it — that is the whole point of the rebuild.
+Each scene depicts the real product surface as an animated UI mockup (built in JSX, not screenshots) — the point of the rebuild is to show the genuine feature set, never generic statements about "how the mind works".
 
 ### 8.2 Key architectural rules
 
-- **Persistent background layer.** The animated background lives in `VideoTemplate.tsx` outside `<AnimatePresence>` so it drifts continuously across scene cuts instead of resetting per scene.
-- **Demonstrations are animated, not described.** Each demo scene animates the actual phenomenon (a ruler proving the Müller-Lyer lines are equal, the gut answer being crossed out, the never-shown word being "remembered") — the payoff is the viewer experiencing the effect, not reading about it.
+- **Persistent background layer.** The animated background (drifting radial gradients + a faint grid) lives in `VideoTemplate.tsx` outside `<AnimatePresence>` so it drifts continuously across scene cuts instead of resetting per scene.
+- **Show the product, not concepts.** Each scene animates an actual app interaction (the depth toggle switching, the tutor streaming an answer, the homework locking, the detection rationales resolving) — the payoff is the viewer seeing the real, substantial feature set, not reading taglines.
+- **Branding constraints.** No "baby"/"child"/"kid" language, no "no math" framing, no reference to any prior/critical-thinking course; the outro app-title line is exactly `Cognitive Science 101 — AI-Powered Course`.
 - **`AnimatePresence` key = `currentSceneKey`** (NOT `baseSceneKey`). When scene-lock toggles `_r1` / `_r2` on the durations object, both iterations must remount and re-animate.
 - **Audio.** One bg music file at `public/audio/bg_music.mp3`, scene-synced via `SCENE_START_SEC` — on every scene change the audio seeks to that scene's canonical start offset (epsilon 0.18s).
 - **Mute wiring.** Iframe preview defaults to muted; control bar exposes `Volume2` / `VolumeX`. Export path renders `<VideoTemplate />` with no props → unmuted, no controls. The mute toggle is **declarative JSX (`<audio muted={muted}>`) only** — it must not also re-seek `audio.currentTime`, or unmute restarts the scene's audio.

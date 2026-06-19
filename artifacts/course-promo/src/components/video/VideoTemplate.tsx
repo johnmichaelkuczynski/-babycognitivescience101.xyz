@@ -9,21 +9,21 @@ import { Scene5 } from './video_scenes/Scene5';
 import { Scene6 } from './video_scenes/Scene6';
 
 export const SCENE_DURATIONS = {
-  s1_intro: 4000,
-  s2_perception: 7000,
-  s3_language: 7000,
-  s4_reasoning: 7000,
-  s5_memory: 7000,
-  s6_outro: 6000
+  curriculum: 6000,
+  lecture_tutor: 7500,
+  homework: 7500,
+  detection: 6000,
+  analytics: 6500,
+  outro: 4500
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
-  s1_intro: Scene1,
-  s2_perception: Scene2,
-  s3_language: Scene3,
-  s4_reasoning: Scene4,
-  s5_memory: Scene5,
-  s6_outro: Scene6
+  curriculum: Scene1,
+  lecture_tutor: Scene2,
+  homework: Scene3,
+  detection: Scene4,
+  analytics: Scene5,
+  outro: Scene6
 };
 
 const SCENE_START_SEC: Record<string, number> = (() => {
@@ -56,7 +56,7 @@ export default function VideoTemplate({
   }, [currentSceneKey, onSceneChange]);
 
   const baseSceneKey = currentSceneKey.replace(/_r[12]$/, '') as keyof typeof SCENE_DURATIONS;
-  const SceneComponent = SCENE_COMPONENTS[baseSceneKey];
+  const SceneComponent = SCENE_COMPONENTS[baseSceneKey] || Scene1;
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -69,29 +69,27 @@ export default function VideoTemplate({
       audio.currentTime = targetTime;
     }
     audio.play().catch(() => {});
-  }, [currentSceneKey, baseSceneKey, muted]);
+  }, [currentSceneKey, baseSceneKey]);
 
   return (
-    <div className="w-full h-screen overflow-hidden relative bg-bg-dark text-text-primary">
+    <div className="w-full h-screen overflow-hidden relative bg-slate-50 text-slate-900 font-body">
       {/* Persistent Background Layer */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
-          className="absolute w-[120vw] h-[120vw] rounded-full opacity-[0.04] blur-3xl mix-blend-screen"
-          style={{ background: 'radial-gradient(circle, var(--color-accent), transparent)' }}
-          animate={{ x: ['-20%', '30%', '-10%'], y: ['-10%', '40%', '-20%'], scale: [1, 1.2, 0.9] }}
+          className="absolute w-[80vw] h-[80vw] rounded-full opacity-[0.4] blur-[100px] mix-blend-multiply"
+          style={{ background: 'radial-gradient(circle, #e2e8f0, transparent)' }}
+          animate={{ x: ['-20%', '10%', '-10%'], y: ['-10%', '20%', '-20%'], scale: [1, 1.1, 0.9] }}
           transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute w-[100vw] h-[100vw] rounded-full opacity-[0.04] blur-3xl right-0 bottom-0 mix-blend-screen"
-          style={{ background: 'radial-gradient(circle, var(--color-secondary), transparent)' }}
-          animate={{ x: ['20%', '-20%', '10%'], y: ['10%', '-30%', '20%'] }}
+          className="absolute w-[60vw] h-[60vw] rounded-full opacity-[0.3] blur-[100px] right-0 bottom-0 mix-blend-multiply"
+          style={{ background: 'radial-gradient(circle, #cbd5e1, transparent)' }}
+          animate={{ x: ['20%', '-10%', '10%'], y: ['10%', '-20%', '20%'] }}
           transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
         />
         
-        {/* Subtle noise texture */}
-        <div className="absolute inset-0 opacity-[0.02]" 
-             style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")' }} 
-        />
+        {/* Subtle geometric pattern */}
+        <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(15,23,42,1)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,1)_1px,transparent_1px)] bg-[size:40px_40px]" />
       </div>
 
       <AnimatePresence mode="popLayout">

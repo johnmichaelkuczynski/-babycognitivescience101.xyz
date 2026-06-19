@@ -1,18 +1,18 @@
 # 🧭 Cognitive Science 101
 
-**A One-Unit Baby Course on How the Mind Works — Taught, Tutored, Drilled, and Graded by AI**
+**A One-Unit Introductory Course on How the Mind Works — Taught, Tutored, Drilled, and Graded by AI**
 
 ---
 
 ## 🧩 Overview
 
-Cognitive Science 101 is a self-paced, single-user web course — a plain-language "baby course" on **how the mind works**: perception, memory, language, reasoning, machine minds, and consciousness. No math, coding, or technical background required.
+Cognitive Science 101 is a self-paced, single-user web course — a plain-language introduction to **how the mind works**: perception, memory, language, reasoning, machine minds, and consciousness. It assumes no prior coursework in the field, making it a fast, rigorous on-ramp for adults stepping into a new discipline.
 
 The course teaches reasoning about the mind on an **inverted grading scale**. Most "critical thinking" rewards caution: the more hedged the answer, the safer it feels. Here, hedging is the failure mode. The **strongest, most-falsifiable conclusion the evidence supports about how the mind works earns top credit**; the cautious *"we can't really conclude anything / the brain is too complex"* dodge earns near-zero; florid padding that binds no evidence scores low; and a bold claim the evidence actively defeats also earns zero. Every question rewards committing to the richest supported conclusion while naming the cleanest disconfirming test.
 
 The curriculum is organized into **one unit and 8 sections**: 1.1 What Cognitive Science Is; 1.2 The Big Idea: Mind as Information Processing; 1.3 Perception; 1.4 Memory; 1.5 Language and Thought; 1.6 Reasoning and Bias; 1.7 Brains and Machines; and 1.8 Consciousness.
 
-Designed for **middle schoolers, curious adults wanting brief but meaningful exposure, instructors evaluating AI-taught coursework, and researchers studying AI academic integrity**, Cognitive Science 101 pairs a real curriculum with two layers of AI-authorship detection — surfacing not just *whether* the writing looks AI-generated, but whether the *act of producing it* did.
+Designed for **adults stepping into a new discipline — including graduate students and faculty who need a fast, rigorous on-ramp to cognitive science — alongside instructors evaluating AI-taught coursework and researchers studying AI academic integrity**, Cognitive Science 101 pairs a real curriculum with two layers of AI-authorship detection — surfacing not just *whether* the writing looks AI-generated, but whether the *act of producing it* did.
 
 ---
 
@@ -28,7 +28,7 @@ Designed for **middle schoolers, curious adults wanting brief but meaningful exp
 - **Four-Phase Diagnostic Assessments** — A single Scientific Reasoning instrument runs at four phases (baseline, two mid-course checkpoints, and after the unit) using a 3×3 menu of generated items, so reasoning growth can be tracked across the course. A configurable minimum-to-pass governs pass/fail.
 - **Live Analytics** — Dashboard KPIs (attempts, accuracy, streak), per-section mastery percentages, and a recent-activity feed.
 - **Operator Diagnostics** — One-click self-tests (system health and synthetic-student end-to-end run) verify the entire stack — database, OpenAI integration, GPTZero, detection pipeline, and the practice/grade loop.
-- **Built-In Product Demo Video** — A screencast of the live UI ships as its own deployable artifact, so the product can show itself.
+- **Built-In Promo Video** — An animated promo that walks through the live product ships as its own artifact, so the course can show itself.
 
 ---
 
@@ -55,7 +55,7 @@ Designed for **middle schoolers, curious adults wanting brief but meaningful exp
 
 ## 📊 Designed For
 
-- **Middle Schoolers & Curious Adults:** A complete, plain-language course on how the mind works — with on-demand tutoring and adaptive practice, no instructor required.
+- **Adults New to the Field:** A complete, rigorous-yet-plain-language course on how the mind works — with on-demand tutoring and adaptive practice, no instructor required. Built for learners stepping into a new discipline, from graduate students to faculty.
 - **Instructors & Curriculum Designers:** A working reference for what AI-taught, AI-graded, AI-detection-screened coursework looks like end-to-end.
 - **Academic-Integrity Researchers:** A live testbed for layered AI-authorship detection combining text classification with behavioral keystroke evidence.
 - **Product & Engineering Teams:** A reference implementation of contract-first full-stack architecture, streaming AI UX, and self-diagnostic operator tooling in a Replit pnpm monorepo.

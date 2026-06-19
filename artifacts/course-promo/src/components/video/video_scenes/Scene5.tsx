@@ -4,84 +4,115 @@ import { useEffect, useState } from 'react';
 export function Scene5() {
   const [phase, setPhase] = useState(0);
 
-  const words = ["bed", "rest", "awake", "tired", "dream", "night", "snooze"];
-
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),  // Start flashing words
-      setTimeout(() => setPhase(2), 2500), // Stop flashing, ask question
-      setTimeout(() => setPhase(3), 4500), // Reveal "SLEEP"
-      setTimeout(() => setPhase(4), 5500), // "Never shown"
+      setTimeout(() => setPhase(1), 500),
+      setTimeout(() => setPhase(2), 1500), // Graph animates
+      setTimeout(() => setPhase(3), 3000), // Stats pop
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
 
   return (
     <motion.div 
-      className="absolute inset-0 flex flex-col items-center justify-center bg-[#1e293b]"
-      initial={{ opacity: 0, x: '20%' }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="absolute inset-0 flex flex-col items-center justify-center p-20 bg-slate-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, y: '10%' }}
+      transition={{ duration: 0.8 }}
     >
-      <motion.div 
-        className="absolute top-16 left-16 text-[2vw] font-bold text-accent tracking-widest uppercase"
-        initial={{ opacity: 0, x: -20 }}
-        animate={phase >= 1 ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-      >
-        Unit 1.4: Memory
-      </motion.div>
-
-      <div className="relative w-full h-full flex flex-col items-center justify-center">
-        
-        {/* Flashing Words */}
-        {phase === 1 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            {words.map((word, i) => (
-              <motion.div
-                key={i}
-                className="absolute text-[8vw] font-black uppercase tracking-widest text-white/80"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: [0, 1, 0], scale: [0.8, 1, 1.2] }}
-                transition={{ duration: 0.3, delay: i * 0.25, times: [0, 0.5, 1] }}
-              >
-                {word}
-              </motion.div>
-            ))}
-          </div>
-        )}
-
-        {/* Question & Reveal */}
-        {phase >= 2 && (
+      <div className="flex w-full max-w-6xl items-center gap-20 relative z-10">
+        <div className="flex-1">
           <motion.div 
-            className="flex flex-col items-center z-10"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
           >
-            <div className="text-[4vw] font-display font-bold text-white mb-8">
-              Did you see the word
+            <div className="font-bold text-lg mb-8 text-slate-800">Mastery Trajectory</div>
+            
+            {/* Chart Area */}
+            <div className="relative h-[200px] border-l-2 border-b-2 border-slate-200">
+              {/* Grid lines */}
+              <div className="absolute inset-0 flex flex-col justify-between">
+                {[1,2,3,4].map(i => <div key={i} className="border-t border-slate-100 w-full" />)}
+              </div>
+              
+              {/* Line graph */}
+              {phase >= 2 && (
+                <svg className="absolute inset-0 h-full w-full overflow-visible" preserveAspectRatio="none">
+                  <motion.path 
+                    d="M 0 150 Q 50 150 100 120 T 200 100 T 300 40 T 400 20"
+                    fill="none"
+                    stroke="#0f172a"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                  />
+                  {/* Nodes */}
+                  {[
+                    {cx: 0, cy: 150}, {cx: 100, cy: 120}, {cx: 200, cy: 100}, {cx: 300, cy: 40}, {cx: 400, cy: 20}
+                  ].map((pos, i) => (
+                    <motion.circle 
+                      key={i}
+                      cx={pos.cx} cy={pos.cy} r="6" fill="#fff" stroke="#0f172a" strokeWidth="3"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 1 + i * 0.3, type: "spring" }}
+                    />
+                  ))}
+                </svg>
+              )}
             </div>
-            <motion.div 
-              className="text-[10vw] font-black uppercase tracking-tighter leading-none"
-              initial={{ scale: 0.8, color: '#fdfbf7' }}
-              animate={phase >= 3 ? { scale: 1.1, color: '#f43f5e' } : { scale: 1, color: '#fdfbf7' }}
-              transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            >
-              SLEEP?
-            </motion.div>
 
-            {phase >= 4 && (
-              <motion.div
-                className="mt-8 text-[3vw] font-bold text-white/60 bg-black/40 px-8 py-4 rounded-xl backdrop-blur-sm"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+            <div className="flex justify-between mt-8">
+              <motion.div 
+                className="text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
               >
-                It was <span className="text-white">never</span> shown.
+                <div className="text-3xl font-black text-slate-900">85%</div>
+                <div className="text-xs text-slate-500 uppercase tracking-widest font-bold">Accuracy</div>
               </motion.div>
-            )}
+              <motion.div 
+                className="text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                transition={{ delay: 0.1 }}
+              >
+                <div className="text-3xl font-black text-slate-900">12</div>
+                <div className="text-xs text-slate-500 uppercase tracking-widest font-bold">Streak</div>
+              </motion.div>
+              <motion.div 
+                className="text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="text-3xl font-black text-blue-600">Lvl 4</div>
+                <div className="text-xs text-slate-500 uppercase tracking-widest font-bold">Difficulty</div>
+              </motion.div>
+            </div>
           </motion.div>
-        )}
+        </div>
+
+        <div className="flex-1 pr-10">
+          <motion.h2 
+            className="text-slate-500 font-bold tracking-widest uppercase text-sm mb-4"
+          >
+            Live Analytics
+          </motion.h2>
+          <motion.h1 
+            className="text-5xl font-display font-bold text-slate-900 leading-tight mb-6"
+          >
+            Adaptive practice that actually adapts.
+          </motion.h1>
+          <motion.p className="text-xl text-slate-600 leading-relaxed">
+            Questions ramp up in difficulty after a streak, and scale down dynamically after a miss. 
+            Track per-section mastery in real time.
+          </motion.p>
+        </div>
       </div>
     </motion.div>
   );

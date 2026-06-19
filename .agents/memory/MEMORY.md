@@ -10,5 +10,6 @@
 - [Diagnostic instrument label](reasoning-instrument-label.md) — now ONE instrument `ccr`→"Constructive Critical Reasoning" across 4 time-series phases; older multi-instrument/subject/reasoning models removed.
 - [Course design mandates](course-design-mandates.md) — math keyboard required on ALL inputs incl. tutor (even no-math course); every question (incl. adaptive drill) must be scenario-reasoning, never one-word/recitation.
 - [Course rebrand hotspots](rebrand-hotspots.md) — in-place rebrands leave stale branding in logo SVG aria-label, demo sidebar initials, hardcoded demo problem counts, and every artifact.toml title; fresh DB needs `db push` before reseed.
+- [Course content & branding rules](branding-rules.md) — adult audience; NEVER "baby/kid"/"no math"/prior-CCTST; literal app name; YouTube title exactly `X — AI-Powered Course`; promo must show the real product, not abstract/generic demos.
 - [Format-weighted course rollup](format-weighted-rollup.md) — course aggregate must weight each section's bestScore by the chosen format's configurable point value; unsubmitted sections use the neutral mean weight.
 - [Removing an artifact](removing-artifacts.md) — artifact-managed workflows reject removeWorkflow (PROHIBITED_ACTION); delete the `artifacts/<slug>/` dir and the platform reconciles the workflow.
