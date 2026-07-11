@@ -148,6 +148,8 @@ export function setupAuth(app: Express) {
         process.env.REPLIT_DEV_DOMAIN || "",
         // CHANGED: removed "textsurgeonplus.xyz" and "www.textsurgeonplus.xyz"
         // (those were the previous app's custom domains, not this app's).
+        // Production .replit.app domain for this deployment:
+        "baby-cognitive-science.replit.app",
         "localhost:5000",
       ]
         .filter(Boolean)
