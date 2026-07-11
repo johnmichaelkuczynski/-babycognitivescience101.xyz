@@ -31,6 +31,7 @@ export default function LoginGate() {
 
           <a
             href={`${basePath}/auth/google`}
+            target="_top"
             className="flex items-center justify-center gap-3 w-full px-5 py-3 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" aria-hidden>
