@@ -54,8 +54,14 @@ export function Sidebar() {
         })}
       </div>
 
-      <div className="p-4 border-t border-border text-xs text-muted-foreground text-center">
-        Cognitive Science 101
+      <div className="p-4 border-t border-border text-xs text-muted-foreground text-center flex flex-col gap-1">
+        <span>Cognitive Science 101</span>
+        <a
+          href="mailto:zhi@zhisystems.org"
+          className="hover:text-foreground transition-colors"
+        >
+          Contact us
+        </a>
       </div>
     </div>
   );
