@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, createContext } from "react";
+import React from "react";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -9,7 +10,16 @@ export interface AuthUser {
   displayName: string | null;
 }
 
-export function useAuthUser() {
+interface AuthState {
+  user: AuthUser | null;
+  loading: boolean;
+  refetch: () => void;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthState | null>(null);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -36,5 +46,15 @@ export function useAuthUser() {
     setUser(null);
   };
 
-  return { user, loading, refetch, signOut };
+  return React.createElement(
+    AuthContext.Provider,
+    { value: { user, loading, refetch, signOut } },
+    children
+  );
+}
+
+export function useAuthUser(): AuthState {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuthUser must be used inside AuthProvider");
+  return ctx;
 }

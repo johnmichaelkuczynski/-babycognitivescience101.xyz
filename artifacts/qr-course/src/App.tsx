@@ -22,6 +22,9 @@ import Reasoning from "@/pages/Reasoning";
 import ReasoningRunner from "@/pages/ReasoningRunner";
 import Grades from "@/pages/Grades";
 import AdminMode from "@/pages/AdminMode";
+import Administrative from "@/pages/Administrative";
+import LoginGate from "@/components/LoginGate";
+import { AuthProvider, useAuthUser } from "@/lib/useAuthUser";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -45,6 +48,7 @@ function Router() {
       <Route path="/reasoning/:id" component={ReasoningRunner} />
       <Route path="/grades" component={Grades} />
       <Route path="/admin" component={AdminMode} />
+      <Route path="/administrative" component={Administrative} />
       <Route path="/diagnostics" component={Diagnostics} />
       <Route path="/weeks/:weekNumber" component={WeekView} />
       <Route path="/lectures/:lectureId" component={LectureView} />
@@ -54,13 +58,32 @@ function Router() {
   );
 }
 
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuthUser();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) return <LoginGate />;
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <WouterRouter base={basePath}>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Router />
-          <Toaster />
+          <AuthProvider>
+            <AuthGate>
+              <Router />
+              <Toaster />
+            </AuthGate>
+          </AuthProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </WouterRouter>

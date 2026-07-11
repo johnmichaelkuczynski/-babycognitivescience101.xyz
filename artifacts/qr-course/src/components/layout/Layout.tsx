@@ -10,6 +10,7 @@ const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 export function Sidebar() {
   const [location] = useLocation();
   const [adminMode] = useAdminMode();
+  const { user } = useAuthUser();
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -19,6 +20,9 @@ export function Sidebar() {
     { href: "/analytics", label: "Analytics", icon: BarChart3 },
     ...(adminMode
       ? [{ href: "/admin", label: "Administrator", icon: ShieldCheck }]
+      : []),
+    ...(user
+      ? [{ href: "/administrative", label: "Administrative", icon: ShieldCheck }]
       : []),
   ];
 
