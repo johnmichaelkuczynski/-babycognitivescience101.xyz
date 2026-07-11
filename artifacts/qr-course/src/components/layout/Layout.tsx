@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, PenTool, BarChart3, Activity, RotateCcw, Sparkles, Scale, GraduationCap, ShieldCheck, Search } from "lucide-react";
+import { LayoutDashboard, PenTool, BarChart3, Activity, RotateCcw, Sparkles, Scale, GraduationCap, ShieldCheck, Search, LogIn, LogOut, User } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAdminMode } from "@/lib/adminMode";
+import { useAuthUser } from "@/lib/useAuthUser";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -72,9 +73,11 @@ function TopBar() {
   const active = location.startsWith("/diagnostics");
   const [adminMode, setAdminMode] = useAdminMode();
   const qc = useQueryClient();
+  const { user, loading: authLoading, signOut } = useAuthUser();
   const [resetting, setResetting] = useState(false);
   const [expanding, setExpanding] = useState(false);
   const [expandProgress, setExpandProgress] = useState<string | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
 
   async function handleExpandLectures() {
     setExpanding(true);
@@ -136,6 +139,12 @@ function TopBar() {
     }
   }
 
+  async function handleSignOut() {
+    setSigningOut(true);
+    await signOut();
+    setSigningOut(false);
+  }
+
   return (
     <div className="sticky top-0 z-10 flex items-center justify-end gap-2 px-6 py-3 border-b border-border bg-background/80 backdrop-blur">
       <button
@@ -185,6 +194,41 @@ function TopBar() {
         <ShieldCheck className="w-4 h-4" />
         {adminMode ? "Admin: On" : "Admin: Off"}
       </button>
+
+      <div className="mx-1 h-6 w-px bg-border" />
+
+      {!authLoading && (
+        user ? (
+          <>
+            <span
+              className="hidden sm:inline-flex items-center gap-1.5 text-sm text-muted-foreground max-w-[14rem] truncate"
+              title={user.email ?? undefined}
+            >
+              <User className="w-3.5 h-3.5 shrink-0" />
+              {user.displayName || user.email || user.username}
+            </span>
+            <button
+              onClick={handleSignOut}
+              disabled={signingOut}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium border border-border hover:bg-secondary disabled:opacity-50"
+              data-testid="button-sign-out"
+              title="Sign out"
+            >
+              <LogOut className="w-4 h-4" />
+              {signingOut ? "Signing out…" : "Sign out"}
+            </button>
+          </>
+        ) : (
+          <a
+            href={`${basePath}/auth/google`}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            data-testid="button-sign-in"
+          >
+            <LogIn className="w-4 h-4" />
+            Sign in with Google
+          </a>
+        )
+      )}
     </div>
   );
 }
