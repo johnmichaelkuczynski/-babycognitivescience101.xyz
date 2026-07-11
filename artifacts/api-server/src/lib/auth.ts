@@ -64,11 +64,28 @@ export function setupAuth(app: Express) {
     console.log("Session pool connected to database");
   });
 
+  // connect-pg-simple's createTableIfMissing reads a bundled .sql file that
+  // esbuild doesn't include, causing ENOENT at startup. Create the table
+  // manually instead so sessions always persist correctly.
+  pool
+    .query(
+      `CREATE TABLE IF NOT EXISTS "user_sessions" (
+         "sid"    varchar       NOT NULL,
+         "sess"   json          NOT NULL,
+         "expire" timestamp(6)  NOT NULL,
+         CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE
+       );
+       CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "user_sessions" ("expire");`
+    )
+    .catch((err: Error) =>
+      console.error("Session table init error (non-fatal):", err)
+    );
+
   // Session setup with database storage
   const pgStore = new PgSession({
     pool,
     tableName: "user_sessions",
-    createTableIfMissing: true,
+    createTableIfMissing: false,
     errorLog: console.error.bind(console, "Session store error:"),
   });
 
