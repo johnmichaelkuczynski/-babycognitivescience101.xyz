@@ -21,6 +21,47 @@ export default function Dashboard() {
           <p className="text-muted-foreground">Welcome to your Cognitive Science 101 course workspace.</p>
         </div>
 
+        <Card>
+          <CardHeader className="pb-2 flex flex-row items-start justify-between gap-4 flex-wrap">
+            <CardTitle className="text-xl font-serif">Topics Covered in This Course</CardTitle>
+            <div className="flex items-center gap-2">
+              <a
+                href={`${import.meta.env.BASE_URL}api/course/download.pdf`}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                data-testid="link-download-course-pdf"
+                title="Download the full course as a PDF: short lectures, practice homework, and a practice exam"
+              >
+                Download the Course (PDF)
+              </a>
+              <a
+                href={`${import.meta.env.BASE_URL}api/course/download.txt`}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border border-border hover:bg-secondary transition-colors"
+                data-testid="link-download-course-txt"
+                title="Download the full course as plain text"
+              >
+                TXT
+              </a>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoadingOverview ? (
+              <Skeleton className="h-32 w-full" />
+            ) : (
+              <ol className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1.5 list-none">
+                {(overview?.weeks.flatMap(w => w.lectures) ?? []).map((lec, i) => (
+                  <li key={lec.id} className="flex gap-2 text-sm">
+                    <span className="font-serif font-bold text-primary w-5 shrink-0 text-right">{i + 1}.</span>
+                    <span>{lec.title}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <p className="mt-3 text-xs text-muted-foreground">
+              The PDF includes the short version of every lecture, practice homework for each section, and a practice exam with an answer guide.
+            </p>
+          </CardContent>
+        </Card>
+
         <ReasoningCallout phase="before" />
         <ReasoningCallout phase="after" />
 

@@ -364,6 +364,15 @@ export async function customFetch<T = unknown>(
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
+    // Server signals that the anonymous free-usage budget is exhausted;
+    // let the app show a sign-in prompt.
+    if (
+      response.status === 401 &&
+      typeof window !== "undefined" &&
+      (errorData as { code?: string } | null | undefined)?.code === "LOGIN_REQUIRED"
+    ) {
+      window.dispatchEvent(new CustomEvent("api:login-required"));
+    }
     throw new ApiError(response, errorData, requestInfo);
   }
 

@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://babycognitivescience101.xyz/sitemap.xml

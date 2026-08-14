@@ -17,6 +17,8 @@ import {
 } from "@workspace/api-zod";
 import { chatText } from "../lib/ai";
 import { getCourseSettings } from "../lib/settings";
+import PDFDocument from "pdfkit";
+import { SECTIONS, type HomeworkItem } from "../lib/homeworkContent";
 
 const router: IRouter = Router();
 
@@ -24,7 +26,7 @@ const WEEK_TITLES: Record<number, { title: string; summary: string }> = {
   1: {
     title: "Cognitive Science 101",
     summary:
-      "A baby course on how the mind works — treating the mind as information processing across perception, memory, language, reasoning and bias, machine minds, and consciousness.",
+      "A one-unit course on how the mind works — treating the mind as information processing across perception, memory, language, reasoning and bias, machine minds, and consciousness.",
   },
 };
 
@@ -276,6 +278,213 @@ router.delete(
     res.json(GetLectureResponse.parse(updated));
   },
 );
+
+// ---------------------------------------------------------------------------
+// Downloadable course PDF: short lectures + practice homework + practice exam.
+// Built from the course's authored content; no AI calls, free to download.
+// ---------------------------------------------------------------------------
+
+function stripMarkdown(md: string): string {
+  return md
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^\s*[-*]\s+/gm, "•  ")
+    .replace(/^\s*>\s?/gm, "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .trim();
+}
+
+function renderItem(
+  doc: PDFKit.PDFDocument,
+  n: number,
+  item: HomeworkItem,
+): void {
+  doc.font("Times-Bold").fontSize(11).text(`Problem ${n}.`, { paragraphGap: 2 });
+  doc.font("Times-Roman").fontSize(11).text(stripMarkdown(item.prompt), {
+    paragraphGap: 4,
+  });
+  if (item.mcOptions && item.mcOptions.length > 0) {
+    item.mcOptions.forEach((opt, i) => {
+      doc.text(`   ${String.fromCharCode(65 + i)}. ${opt.text}`, {
+        paragraphGap: 1,
+      });
+    });
+  }
+  if (item.writtenRubric?.prompt) {
+    doc
+      .font("Times-Italic")
+      .text(`Written follow-up: ${item.writtenRubric.prompt}`, {
+        paragraphGap: 2,
+      });
+  }
+  doc.moveDown(0.6);
+}
+
+function itemToText(n: number, item: HomeworkItem): string {
+  let out = `Problem ${n}. ${stripMarkdown(item.prompt)}\n`;
+  if (item.mcOptions && item.mcOptions.length > 0) {
+    item.mcOptions.forEach((opt, i) => {
+      out += `   ${String.fromCharCode(65 + i)}. ${opt.text}\n`;
+    });
+  }
+  if (item.writtenRubric?.prompt) {
+    out += `   Written follow-up: ${item.writtenRubric.prompt}\n`;
+  }
+  return out;
+}
+
+router.get("/course/download.txt", async (_req, res) => {
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader(
+    "Content-Disposition",
+    'attachment; filename="Cognitive-Science-101-Course.txt"',
+  );
+
+  const divider = "=".repeat(72);
+  const lines: string[] = [];
+  lines.push(divider, "COGNITIVE SCIENCE 101", "A one-unit introductory course on how the mind works.", divider, "");
+  lines.push("TOPICS COVERED", "");
+  SECTIONS.forEach((s, i) => lines.push(`${i + 1}. ${s.title}`));
+  lines.push(
+    "",
+    "This file contains the short version of every lecture, practice homework problems for each section, and a practice exam. The full course — AI tutoring, graded homework in three formats, adaptive practice, and analytics — is available online.",
+    "",
+  );
+
+  for (const [i, s] of SECTIONS.entries()) {
+    lines.push(divider, `SECTION ${i + 1}: ${s.title.toUpperCase()}`, divider, "");
+    lines.push(stripMarkdown(s.blurb), "");
+    lines.push(stripMarkdown(s.lectureTitle), "");
+    lines.push(stripMarkdown(s.body), "");
+    const items: HomeworkItem[] = [
+      ...s.homework.mcq.slice(0, 2),
+      ...s.homework.written.slice(0, 1),
+    ];
+    if (items.length > 0) {
+      lines.push("PRACTICE HOMEWORK", "");
+      items.forEach((item, n) => lines.push(itemToText(n + 1, item)));
+    }
+  }
+
+  const examItems = SECTIONS.map((s) => s.homework.mcq[2] ?? s.homework.mcq[0]).filter(
+    (x): x is HomeworkItem => Boolean(x),
+  );
+  lines.push(divider, "PRACTICE EXAM", divider, "");
+  lines.push(
+    "One question from each section. For multiple-choice questions, pick the answer that commits to the strongest conclusion the evidence supports.",
+    "",
+  );
+  examItems.forEach((item, n) => lines.push(itemToText(n + 1, item)));
+
+  lines.push(divider, "PRACTICE EXAM — ANSWER GUIDE", divider, "");
+  examItems.forEach((item, n) => {
+    lines.push(`Problem ${n + 1}.`);
+    lines.push(`Best answer: ${stripMarkdown(item.correctAnswer)}`);
+    lines.push(stripMarkdown(item.explanation), "");
+  });
+
+  res.send(lines.join("\n"));
+});
+
+router.get("/course/download.pdf", async (_req, res) => {
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    'attachment; filename="Cognitive-Science-101-Course.pdf"',
+  );
+
+  const doc = new PDFDocument({ size: "LETTER", margin: 60, bufferPages: true });
+  doc.pipe(res);
+
+  // ----- Title page -----
+  doc.font("Times-Bold").fontSize(30).text("Cognitive Science 101", { align: "center" });
+  doc.moveDown(0.5);
+  doc
+    .font("Times-Roman")
+    .fontSize(13)
+    .text(
+      "A one-unit introductory course on how the mind works.",
+      { align: "center" },
+    );
+  doc.moveDown(2);
+  doc.font("Times-Bold").fontSize(15).text("Topics Covered");
+  doc.moveDown(0.5);
+  doc.font("Times-Roman").fontSize(12);
+  SECTIONS.forEach((s, i) => {
+    doc.text(`${i + 1}.  ${s.title}`, { paragraphGap: 3 });
+  });
+  doc.moveDown(1.5);
+  doc
+    .fontSize(10)
+    .fillColor("#555555")
+    .text(
+      "This booklet contains the short version of every lecture, practice homework problems for each section, and a practice exam. The full course — AI tutoring, graded homework in three formats, adaptive practice, and analytics — is available online.",
+    )
+    .fillColor("#000000");
+
+  // ----- Lectures + practice homework -----
+  for (const [i, s] of SECTIONS.entries()) {
+    doc.addPage();
+    doc.font("Times-Bold").fontSize(18).text(`Section ${i + 1}: ${s.title}`);
+    doc.moveDown(0.3);
+    doc.font("Times-Italic").fontSize(11).text(stripMarkdown(s.blurb));
+    doc.moveDown(0.8);
+    doc.font("Times-Bold").fontSize(13).text(stripMarkdown(s.lectureTitle));
+    doc.moveDown(0.4);
+    doc
+      .font("Times-Roman")
+      .fontSize(11)
+      .text(stripMarkdown(s.body), { paragraphGap: 6, lineGap: 2 });
+
+    // A few practice homework problems per section.
+    const items: HomeworkItem[] = [
+      ...s.homework.mcq.slice(0, 2),
+      ...s.homework.written.slice(0, 1),
+    ];
+    if (items.length > 0) {
+      doc.moveDown(1);
+      doc.font("Times-Bold").fontSize(14).text("Practice Homework");
+      doc.moveDown(0.4);
+      items.forEach((item, n) => renderItem(doc, n + 1, item));
+    }
+  }
+
+  // ----- Practice exam -----
+  doc.addPage();
+  doc.font("Times-Bold").fontSize(18).text("Practice Exam");
+  doc.moveDown(0.3);
+  doc
+    .font("Times-Roman")
+    .fontSize(11)
+    .text(
+      "One question from each section. Answer every question. For multiple-choice questions, pick the answer that commits to the strongest conclusion the evidence supports.",
+    );
+  doc.moveDown(0.8);
+  const examItems = SECTIONS.map((s) => s.homework.mcq[2] ?? s.homework.mcq[0]).filter(
+    (x): x is HomeworkItem => Boolean(x),
+  );
+  examItems.forEach((item, n) => renderItem(doc, n + 1, item));
+
+  // ----- Answer key -----
+  doc.addPage();
+  doc.font("Times-Bold").fontSize(18).text("Practice Exam — Answer Guide");
+  doc.moveDown(0.5);
+  examItems.forEach((item, n) => {
+    doc.font("Times-Bold").fontSize(11).text(`Problem ${n + 1}.`, { paragraphGap: 2 });
+    doc
+      .font("Times-Roman")
+      .fontSize(11)
+      .text(`Best answer: ${stripMarkdown(item.correctAnswer)}`, { paragraphGap: 2 });
+    doc
+      .font("Times-Italic")
+      .fontSize(10)
+      .text(stripMarkdown(item.explanation), { paragraphGap: 6 });
+  });
+
+  doc.end();
+});
 
 router.get("/course/settings", async (_req, res) => {
   const settings = await getCourseSettings();

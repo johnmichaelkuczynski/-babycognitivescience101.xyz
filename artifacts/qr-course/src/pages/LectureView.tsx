@@ -150,6 +150,10 @@ export default function LectureView() {
         `${import.meta.env.BASE_URL}api/diagnostics/expand-lectures?level=${target}&id=${lecture.id}`,
         { method: "POST" },
       );
+      if (res.status === 401) {
+        window.dispatchEvent(new CustomEvent("api:login-required"));
+        throw new Error("Sign in with Google to keep generating.");
+      }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as { updated?: number; failed?: number };
       if (!data.updated) {

@@ -107,6 +107,10 @@ function TopBar() {
             `${basePath}/api/diagnostics/expand-lectures?level=${job.level}&id=${job.id}`,
             { method: "POST" },
           );
+          if (res.status === 401) {
+            window.dispatchEvent(new CustomEvent("api:login-required"));
+            throw new Error("Sign in required to keep generating.");
+          }
           if (!res.ok) {
             failed++;
             continue;

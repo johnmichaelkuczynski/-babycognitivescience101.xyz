@@ -1,6 +1,6 @@
 import { db } from "@workspace/db";
-import { usersTable, userVisitsTable } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { usersTable, userVisitsTable, uniqueVisitorsTable } from "@workspace/db";
+import { eq, desc, sql, gte, count } from "drizzle-orm";
 
 type User = typeof usersTable.$inferSelect;
 
@@ -80,5 +80,79 @@ export const storage = {
       .select({ visitedAt: userVisitsTable.visitedAt })
       .from(userVisitsTable);
     return rows.map((v) => (v.visitedAt as Date).toISOString());
+  },
+
+  // Upsert an anonymous unique visitor keyed by browser cookie.
+  async recordUniqueVisit(visitorId: string): Promise<void> {
+    await db
+      .insert(uniqueVisitorsTable)
+      .values({ visitorId })
+      .onConflictDoUpdate({
+        target: uniqueVisitorsTable.visitorId,
+        set: {
+          visitCount: sql`${uniqueVisitorsTable.visitCount} + 1`,
+          lastSeenAt: sql`now()`,
+        },
+      });
+  },
+
+  async getAnonAiTokens(visitorId: string): Promise<number> {
+    const [row] = await db
+      .select({ used: uniqueVisitorsTable.aiTokensUsed })
+      .from(uniqueVisitorsTable)
+      .where(eq(uniqueVisitorsTable.visitorId, visitorId));
+    return row?.used ?? 0;
+  },
+
+  async addAnonAiTokens(visitorId: string, tokens: number): Promise<void> {
+    await db
+      .insert(uniqueVisitorsTable)
+      .values({ visitorId, aiTokensUsed: tokens })
+      .onConflictDoUpdate({
+        target: uniqueVisitorsTable.visitorId,
+        set: {
+          aiTokensUsed: sql`${uniqueVisitorsTable.aiTokensUsed} + ${tokens}`,
+          lastSeenAt: sql`now()`,
+        },
+      });
+  },
+
+  async getUniqueVisitorStats(): Promise<{
+    allTime: number;
+    last24Hours: number;
+    lastMonth: number;
+    lastYear: number;
+    totalPageLoads: number;
+  }> {
+    const now = Date.now();
+    const cutoff = (ms: number) => new Date(now - ms);
+    const DAY = 24 * 60 * 60 * 1000;
+
+    const [[all], [day], [month], [year], [loads]] = await Promise.all([
+      db.select({ n: count() }).from(uniqueVisitorsTable),
+      db
+        .select({ n: count() })
+        .from(uniqueVisitorsTable)
+        .where(gte(uniqueVisitorsTable.lastSeenAt, cutoff(DAY))),
+      db
+        .select({ n: count() })
+        .from(uniqueVisitorsTable)
+        .where(gte(uniqueVisitorsTable.lastSeenAt, cutoff(30 * DAY))),
+      db
+        .select({ n: count() })
+        .from(uniqueVisitorsTable)
+        .where(gte(uniqueVisitorsTable.lastSeenAt, cutoff(365 * DAY))),
+      db
+        .select({ n: sql<number>`coalesce(sum(${uniqueVisitorsTable.visitCount}), 0)::int` })
+        .from(uniqueVisitorsTable),
+    ]);
+
+    return {
+      allTime: all.n,
+      last24Hours: day.n,
+      lastMonth: month.n,
+      lastYear: year.n,
+      totalPageLoads: loads.n,
+    };
   },
 };

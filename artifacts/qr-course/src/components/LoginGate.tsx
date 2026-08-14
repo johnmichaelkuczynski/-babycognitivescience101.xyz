@@ -1,11 +1,33 @@
-import { Search, LogIn } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-export default function LoginGate() {
+export default function LoginGate({
+  modal = false,
+  onDismiss,
+}: {
+  modal?: boolean;
+  onDismiss?: () => void;
+}) {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-md text-center space-y-8">
+    <div
+      className={
+        modal
+          ? "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4"
+          : "min-h-screen bg-background flex items-center justify-center px-4"
+      }
+    >
+      <div className={`w-full max-w-md text-center space-y-8 relative ${modal ? "bg-background rounded-2xl p-8 shadow-2xl" : ""}`}>
+        {modal && onDismiss && (
+          <button
+            onClick={onDismiss}
+            className="absolute top-3 right-3 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            aria-label="Close"
+            data-testid="button-close-login-modal"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
             <Search className="w-8 h-8 text-primary-foreground" />
@@ -23,9 +45,13 @@ export default function LoginGate() {
 
         <div className="border border-border rounded-xl p-8 bg-card shadow-sm space-y-6">
           <div className="space-y-1">
-            <h2 className="font-semibold text-lg">Sign in to continue</h2>
+            <h2 className="font-semibold text-lg">
+              {modal ? "Sign in to keep going" : "Sign in to continue"}
+            </h2>
             <p className="text-sm text-muted-foreground">
-              Access to this course requires a Google account.
+              {modal
+                ? "You've used your free preview of the AI tutor and grading. Sign in with Google to keep using the course — it's free."
+                : "Access to this course requires a Google account."}
             </p>
           </div>
 

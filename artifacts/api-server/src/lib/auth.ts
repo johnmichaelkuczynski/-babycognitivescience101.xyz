@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
+import { randomUUID } from "node:crypto";
 import type { Express, RequestHandler } from "express";
 import { storage } from "./storage";
 import pg from "pg";
@@ -79,6 +80,24 @@ export function setupAuth(app: Express) {
     )
     .catch((err: Error) =>
       console.error("Session table init error (non-fatal):", err)
+    );
+
+  // Ensure the unique-visitor table exists on boot (mirrors the session-table
+  // pattern) so fresh/production databases work without a manual migration.
+  pool
+    .query(
+      `CREATE TABLE IF NOT EXISTS "unique_visitors" (
+         "id"            serial PRIMARY KEY,
+         "visitor_id"    text NOT NULL UNIQUE,
+         "visit_count"   integer NOT NULL DEFAULT 1,
+         "first_seen_at" timestamptz NOT NULL DEFAULT now(),
+         "last_seen_at"  timestamptz NOT NULL DEFAULT now()
+       );
+       ALTER TABLE "unique_visitors"
+         ADD COLUMN IF NOT EXISTS "ai_tokens_used" integer NOT NULL DEFAULT 0;`
+    )
+    .catch((err: Error) =>
+      console.error("Unique-visitor table init error (non-fatal):", err)
     );
 
   // Session setup with database storage
@@ -325,6 +344,51 @@ export function setupAuth(app: Express) {
     });
   });
 
+  // --- Unique-visitor tracking (public, anonymous, cookie-based) ---
+  // Every browser gets a random visitor id cookie; each app load upserts a row.
+  const VISITOR_COOKIE = "cs101_vid";
+  // Lightweight in-memory rate limiter: max 10 tracking hits per IP per minute.
+  const trackHits = new Map<string, { count: number; windowStart: number }>();
+  const TRACK_WINDOW_MS = 60 * 1000;
+  const TRACK_MAX_PER_WINDOW = 10;
+  app.post("/api/track/visit", async (req, res) => {
+    try {
+      const ip = req.ip || "unknown";
+      const nowMs = Date.now();
+      const entry = trackHits.get(ip);
+      if (!entry || nowMs - entry.windowStart > TRACK_WINDOW_MS) {
+        trackHits.set(ip, { count: 1, windowStart: nowMs });
+      } else if (++entry.count > TRACK_MAX_PER_WINDOW) {
+        res.status(429).json({ ok: false });
+        return;
+      }
+      if (trackHits.size > 10000) trackHits.clear(); // bound memory
+      const cookies = Object.fromEntries(
+        (req.headers.cookie || "")
+          .split(";")
+          .map((c) => c.trim().split("=").map(decodeURIComponent) as [string, string])
+          .filter((p) => p.length === 2 && p[0])
+      );
+      let vid = cookies[VISITOR_COOKIE];
+      const valid = typeof vid === "string" && /^[A-Za-z0-9-]{16,64}$/.test(vid);
+      if (!valid) {
+        vid = randomUUID();
+        res.cookie(VISITOR_COOKIE, vid, {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: true,
+          maxAge: 2 * 365 * 24 * 60 * 60 * 1000, // 2 years
+          path: "/",
+        });
+      }
+      await storage.recordUniqueVisit(vid!);
+      res.json({ ok: true });
+    } catch (error) {
+      console.error("Track visit error:", error);
+      res.status(500).json({ ok: false });
+    }
+  });
+
   // --- Admin: visitor analytics (restricted to the site owner) ---
   app.get("/api/admin/visits", isAdmin, async (_req, res) => {
     try {
@@ -333,9 +397,10 @@ export function setupAuth(app: Express) {
       const monthAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
       const yearAgo = new Date(now - 365 * 24 * 60 * 60 * 1000);
 
-      const [visitList, allTimestamps] = await Promise.all([
+      const [visitList, allTimestamps, uniqueVisitors] = await Promise.all([
         storage.getVisits(500),
         storage.getVisitTimestampsSince(null),
+        storage.getUniqueVisitorStats(),
       ]);
 
       const times = allTimestamps.map((t) => new Date(t).getTime());
@@ -410,6 +475,7 @@ export function setupAuth(app: Express) {
 
       res.json({
         stats,
+        uniqueVisitors,
         series,
         visits: visitList.map((v) => ({
           id: v.id,

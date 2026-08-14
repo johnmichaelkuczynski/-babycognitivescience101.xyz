@@ -9,7 +9,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import { Users, Clock, TrendingUp, Calendar, Infinity } from "lucide-react";
+import { Users, Clock, TrendingUp, Calendar, Infinity, Eye } from "lucide-react";
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -30,6 +30,13 @@ interface AdminData {
     last24Hours: number;
     lastMonth: number;
     lastYear: number;
+  };
+  uniqueVisitors?: {
+    allTime: number;
+    last24Hours: number;
+    lastMonth: number;
+    lastYear: number;
+    totalPageLoads: number;
   };
   series: {
     last24Hours: Series[];
@@ -187,9 +194,29 @@ export default function Administrative() {
             Administrative
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Google login analytics and visitor log.
+            Unique visitors, Google login analytics, and visitor log.
           </p>
         </div>
+
+        {/* Unique visitors (anonymous, cookie-based — counts everyone, logged in or not) */}
+        {data.uniqueVisitors && (
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Unique visitors
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <StatCard label="Last 24 h" value={data.uniqueVisitors.last24Hours} icon={Clock} />
+              <StatCard label="Last 30 days" value={data.uniqueVisitors.lastMonth} icon={Calendar} />
+              <StatCard label="Last year" value={data.uniqueVisitors.lastYear} icon={TrendingUp} />
+              <StatCard label="All time" value={data.uniqueVisitors.allTime} icon={Users} />
+              <StatCard label="Total page loads" value={data.uniqueVisitors.totalPageLoads} icon={Eye} />
+            </div>
+          </div>
+        )}
+
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground -mb-4">
+          Google logins
+        </h2>
 
         {/* Stat cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

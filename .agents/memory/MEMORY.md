@@ -13,4 +13,5 @@
 - [Course content & branding rules](branding-rules.md) — adult audience; NEVER "baby/kid"/"no math"/prior-CCTST; literal app name; YouTube title exactly `X — AI-Powered Course`; promo must show the real product, not abstract/generic demos.
 - [Format-weighted course rollup](format-weighted-rollup.md) — course aggregate must weight each section's bestScore by the chosen format's configurable point value; unsubmitted sections use the neutral mean weight.
 - [Google OAuth on Replit](google-oauth-replit.md) — three fixes required together: `/auth` proxy path, manual session table (esbuild drops connect-pg-simple's SQL asset), `target="_top"` on login link (Google blocks iframe embeds).
+- [api-server esbuild externals](api-server-esbuild-externals.md) — deps with CJS data-file loading (pdfkit/fontkit etc.) crash the bundled server; add them to build.mjs `external`, don't chase missing helpers.
 - [Removing an artifact](removing-artifacts.md) — artifact-managed workflows reject removeWorkflow (PROHIBITED_ACTION); delete the `artifacts/<slug>/` dir and the platform reconciles the workflow.

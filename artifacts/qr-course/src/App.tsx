@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import {
   Switch,
   Route,
   Router as WouterRouter,
   Redirect,
+  useLocation,
 } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -29,6 +31,46 @@ import { AuthProvider, useAuthUser } from "@/lib/useAuthUser";
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const queryClient = new QueryClient();
+
+// --- SEO: unique document title per route ---
+const TITLE_SUFFIX = "Cognitive Science 101";
+const ROUTE_TITLES: Array<[RegExp, string]> = [
+  [/^\/dashboard/, "Dashboard"],
+  [/^\/assignments\/.+\/practice/, "Practice Assignment"],
+  [/^\/assignments\/.+/, "Homework"],
+  [/^\/assignments/, "Assignments"],
+  [/^\/analytics/, "Analytics"],
+  [/^\/reasoning\/.+/, "Reasoning Assessment"],
+  [/^\/reasoning/, "Reasoning"],
+  [/^\/grades/, "Grades"],
+  [/^\/admin$/, "Admin Mode"],
+  [/^\/administrative/, "Site Analytics"],
+  [/^\/diagnostics/, "Diagnostics"],
+  [/^\/weeks\/.+/, "Course Section"],
+  [/^\/lectures\/.+/, "Lecture"],
+  [/^\/practice\/topic\/.+/, "Topic Practice"],
+];
+
+function PageTitle() {
+  const [location] = useLocation();
+  useEffect(() => {
+    const match = ROUTE_TITLES.find(([re]) => re.test(location));
+    document.title = match
+      ? `${match[1]} — ${TITLE_SUFFIX}`
+      : `${TITLE_SUFFIX} — AI-Taught Online Course on How the Mind Works`;
+  }, [location]);
+  return null;
+}
+
+// --- Unique-visitor tracking: fires once per app load for every visitor ---
+function useTrackVisit() {
+  useEffect(() => {
+    fetch(`${basePath}/api/track/visit`, {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {});
+  }, []);
+}
 
 function Router() {
   return (
@@ -58,8 +100,22 @@ function Router() {
   );
 }
 
+// No login wall: everyone can browse and try the app. When the server says
+// the anonymous free-AI budget is used up (401 LOGIN_REQUIRED), show a
+// sign-in prompt over the app.
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthUser();
+  const [loginPrompt, setLoginPrompt] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setLoginPrompt(true);
+    window.addEventListener("api:login-required", handler);
+    return () => window.removeEventListener("api:login-required", handler);
+  }, []);
+
+  useEffect(() => {
+    if (user) setLoginPrompt(false);
+  }, [user]);
 
   if (loading) {
     return (
@@ -69,13 +125,21 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user) return <LoginGate />;
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      {!user && loginPrompt && (
+        <LoginGate modal onDismiss={() => setLoginPrompt(false)} />
+      )}
+    </>
+  );
 }
 
 function App() {
+  useTrackVisit();
   return (
     <WouterRouter base={basePath}>
+      <PageTitle />
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>
